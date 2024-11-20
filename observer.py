@@ -49,9 +49,9 @@ def main():
     mi_blog = Blog("Mi Blog de Tecnología")
 
     # Crear suscriptores
-    suscriptor1 = SuscriptorEmail("usuario1@example.com")
-    suscriptor2 = SuscriptorEmail("usuario2@example.com")
-    suscriptor3 = SuscriptorSMS("+34612345678")
+    suscriptor1 = SuscriptorEmail("usuario1@ejemplo.com")
+    suscriptor2 = SuscriptorEmail("usuario2@ejemplo.com")
+    suscriptor3 = SuscriptorSMS("+5492615374192")
 
     # Suscribir observadores
     mi_blog.suscribir(suscriptor1)
@@ -59,8 +59,8 @@ def main():
     mi_blog.suscribir(suscriptor3)
 
     # Publicar artículos
-    mi_blog.publicar_articulo("Introducción a Python")
-    mi_blog.publicar_articulo("Patrones de Diseño en Python")
+    mi_blog.publicar_articulo("Publicación1")
+    mi_blog.publicar_articulo("Publicación2")
 
 if __name__ == "__main__":
     main()
