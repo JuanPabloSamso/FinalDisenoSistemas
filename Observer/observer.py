@@ -1,134 +1,66 @@
-from __future__ import annotations
 from abc import ABC, abstractmethod
-from random import randrange
 from typing import List
 
-
-class Subject(ABC):
-    """
-    The Subject interface declares a set of methods for managing subscribers.
-    """
-
+# Interfaz Observador
+class Observador(ABC):
     @abstractmethod
-    def attach(self, observer: Observer) -> None:
-        """
-        Attach an observer to the subject.
-        """
+    def actualizar(self, mensaje: str):
         pass
 
-    @abstractmethod
-    def detach(self, observer: Observer) -> None:
-        """
-        Detach an observer from the subject.
-        """
-        pass
+# Clase Blog (Sujeto Observable)
+class Blog:
+    def __init__(self, nombre: str):
+        self._observadores: List[Observador] = []
+        self._nombre = nombre
 
-    @abstractmethod
-    def notify(self) -> None:
-        """
-        Notify all observers about an event.
-        """
-        pass
+    def suscribir(self, observador: Observador):
+        self._observadores.append(observador)
 
+    def desuscribir(self, observador: Observador):
+        self._observadores.remove(observador)
 
-class ConcreteSubject(Subject):
-    """
-    The Subject owns some important state and notifies observers when the state
-    changes.
-    """
+    def notificar(self, mensaje: str):
+        for observador in self._observadores:
+            observador.actualizar(mensaje)
 
-    _state: int = None
-    """
-    For the sake of simplicity, the Subject's state, essential to all
-    subscribers, is stored in this variable.
-    """
+    def publicar_articulo(self, titulo: str):
+        mensaje = f"Nuevo artículo publicado en {self._nombre}: {titulo}"
+        print(mensaje)
+        self.notificar(mensaje)
 
-    _observers: List[Observer] = []
-    """
-    List of subscribers. In real life, the list of subscribers can be stored
-    more comprehensively (categorized by event type, etc.).
-    """
+# Observadores concretos
+class SuscriptorEmail(Observador):
+    def __init__(self, email: str):
+        self._email = email
 
-    def attach(self, observer: Observer) -> None:
-        print("Subject: Attached an observer.")
-        self._observers.append(observer)
+    def actualizar(self, mensaje: str):
+        print(f"Enviando email a {self._email}: {mensaje}")
 
-    def detach(self, observer: Observer) -> None:
-        self._observers.remove(observer)
+class SuscriptorSMS(Observador):
+    def __init__(self, telefono: str):
+        self._telefono = telefono
 
-    """
-    The subscription management methods.
-    """
+    def actualizar(self, mensaje: str):
+        print(f"Enviando SMS al {self._telefono}: {mensaje}")
 
-    def notify(self) -> None:
-        """
-        Trigger an update in each subscriber.
-        """
+# Ejemplo de uso
+def main():
+    # Crear un blog
+    mi_blog = Blog("Mi Blog de Tecnología")
 
-        print("Subject: Notifying observers...")
-        for observer in self._observers:
-            observer.update(self)
+    # Crear suscriptores
+    suscriptor1 = SuscriptorEmail("usuario1@example.com")
+    suscriptor2 = SuscriptorEmail("usuario2@example.com")
+    suscriptor3 = SuscriptorSMS("+34612345678")
 
-    def some_business_logic(self) -> None:
-        """
-        Usually, the subscription logic is only a fraction of what a Subject can
-        really do. Subjects commonly hold some important business logic, that
-        triggers a notification method whenever something important is about to
-        happen (or after it).
-        """
+    # Suscribir observadores
+    mi_blog.suscribir(suscriptor1)
+    mi_blog.suscribir(suscriptor2)
+    mi_blog.suscribir(suscriptor3)
 
-        print("\nSubject: I'm doing something important.")
-        self._state = randrange(0, 10)
-
-        print(f"Subject: My state has just changed to: {self._state}")
-        self.notify()
-
-
-class Observer(ABC):
-    """
-    The Observer interface declares the update method, used by subjects.
-    """
-
-    @abstractmethod
-    def update(self, subject: Subject) -> None:
-        """
-        Receive update from subject.
-        """
-        pass
-
-
-"""
-Concrete Observers react to the updates issued by the Subject they had been
-attached to.
-"""
-
-
-class ConcreteObserverA(Observer):
-    def update(self, subject: Subject) -> None:
-        if subject._state < 3:
-            print("ConcreteObserverA: Reacted to the event")
-
-
-class ConcreteObserverB(Observer):
-    def update(self, subject: Subject) -> None:
-        if subject._state == 0 or subject._state >= 2:
-            print("ConcreteObserverB: Reacted to the event")
-
+    # Publicar artículos
+    mi_blog.publicar_articulo("Introducción a Python")
+    mi_blog.publicar_articulo("Patrones de Diseño en Python")
 
 if __name__ == "__main__":
-    # The client code.
-
-    subject = ConcreteSubject()
-
-    observer_a = ConcreteObserverA()
-    subject.attach(observer_a)
-
-    observer_b = ConcreteObserverB()
-    subject.attach(observer_b)
-
-    subject.some_business_logic()
-    subject.some_business_logic()
-
-    subject.detach(observer_a)
-
-    subject.some_business_logic()
+    main()
